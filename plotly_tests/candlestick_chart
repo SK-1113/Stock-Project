@@ -1,0 +1,50 @@
+import yfinance
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+tsla = yfinance.Ticker('TSLA')
+hist = tsla.history(period = '1y')
+#print(hist.head())
+
+#CANDLESTICK CHART
+
+#creation of candlestick chart
+fig3 = make_subplots(specs=[[{"secondary_y": True}]])
+fig3.add_trace(go.Candlestick(x=hist.index, open=hist['Open'],
+                              high=hist['High'],
+                              low=hist['Low'],
+                              close=hist['Close'],
+                             ))
+
+fig3.add_trace(go.Bar(x=hist.index, y=hist['Volume'], name='Volume'),secondary_y=True)
+fig3.update_layout(xaxis_rangeslider_visible=False)
+
+
+fig3.add_trace(go.Scatter(x=hist.index,y=hist['Close'].rolling(window=20).mean(),marker_color='blue',name='20 Day MA'))
+fig3.add_trace(go.Bar(x=hist.index, y=hist['Volume'], name='Volume'),secondary_y=True)
+fig3.update_layout(title={'text':'TSLA', 'x':0.5})
+fig3.update_yaxes(range=[0,1000000000],secondary_y=True)
+fig3.update_yaxes(visible=False, secondary_y=True)
+fig3.update_layout(xaxis_rangeslider_visible=False)  #hide range slider
+#fig3.show()
+
+#creating the differentials and organizing their colors based on if they're negative or positive
+hist['diff'] = hist['Close'] - hist['Open']
+hist.loc[hist['diff']>=0, 'color'] = 'green'
+hist.loc[hist['diff']<0, 'color'] = 'red'
+
+#creation of candlestick chart utilizing hist
+fig3 = make_subplots(specs=[[{"secondary_y": True}]])
+fig3.add_trace(go.Candlestick(x=hist.index,
+                              open=hist['Open'],
+                              high=hist['High'],
+                              low=hist['Low'],
+                              close=hist['Close'],
+                              name='Price'))
+fig3.add_trace(go.Scatter(x=hist.index,y=hist['Close'].rolling(window=20).mean(),marker_color='blue',name='20 Day MA'))
+fig3.add_trace(go.Bar(x=hist.index, y=hist['Volume'], name='Volume', marker={'color':hist['color']}),secondary_y=True)
+fig3.update_yaxes(range=[0,700000000],secondary_y=True)
+fig3.update_yaxes(visible=False, secondary_y=True)
+fig3.update_layout(xaxis_rangeslider_visible=False)  #hide range slider
+fig3.update_layout(title={'text':'TSLA', 'x':0.5})
+fig3.show()

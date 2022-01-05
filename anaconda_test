@@ -1,0 +1,28 @@
+# STEP 1 : importing libraries
+
+import datetime
+import pandas as pd
+import yfinance as yf
+from pandas_datareader import data as pdr
+
+from IPython.display import display
+import matplotlib.pyplot as plt
+yf.pdr_override() 
+
+# STEP 2 : Reading data
+
+# Set label
+stocks = ["AAPL"]
+
+# Set start and end dates
+start = datetime.datetime(2013, 1, 1)
+end = datetime.datetime(2018, 3, 9)
+
+# Grab data
+data = pdr.get_data_yahoo(stocks, start = start, end = end)
+
+display(data)
+
+df = pd.DataFrame(data, columns=['Date', 'Adj Close'])
+df.plot(x ='Low', y='Adj Close', kind = 'line')
+plt.show()

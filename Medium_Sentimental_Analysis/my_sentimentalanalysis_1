@@ -1,0 +1,28 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+#grabbing content from HTML websites (financial news sites in this instance)
+ticker = "TSLA"
+url = "https://site.financialmodelingprep.com/financial-summary/" + ticker
+request = requests.get(url)
+#print(request.text)
+
+#parsing the web content so it's actually useful
+parser = BeautifulSoup(request.text, "html.parser")
+news_html = parser.find_all('a', {'class': 'article-item'})
+print(news_html[0])
+
+sentiments = []
+for i in range(0, len(news_html)):
+    sentiments.append(
+        {
+            'ticker' : ticker,
+            'date' : news_html[i].find('h5', {'class':'article-date'}).text,
+            'title' : news_html[i].find('h4', {'class':'article-title'}).text,
+            'text' : news_html[i].find('p', {'class': 'article-text'}).text
+        }
+    )
+    
+df = pd.DataFrame(sentiments)
+df = df.set_index('date')
