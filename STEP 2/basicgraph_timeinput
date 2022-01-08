@@ -1,0 +1,42 @@
+#Import Libraries
+from datetime import datetime
+import pandas
+import yfinance as yf
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def date_check(date1, date2):
+    if(date1.year > date2.year): print("ERROR: Start Year larger than End Year.")
+    if(date1.month < 1 or date1.month > 12): print("ERROR: Start Month does not exist.")
+    if(date1.day < 1 or date1.day > 31): print("ERROR: Start day does not exist.")
+    if(date2.month < 1 or date2.month > 12): print("ERROR: End Month does not exist.")
+    if(date2.day < 1 or date2.day > 31): print("ERROR: End day does not exist.")
+    
+hist = pandas.DataFrame()
+#simple input command
+while (len(hist.index) == 0):
+    first_year = input("Enter the beginning year for data collection: ")
+    first_month = input("Enter the beginning month for data collection: ")
+    first_day = input("Enter the beginning day for data collection: ")
+    end_year = input("Enter the end year for data collection: ")
+    end_month = input("Enter the end month for data collection: ")
+    end_day = input("Enter the end day for the data collection: ")
+    
+    stock_data = yf.Ticker("AAPL")
+    startDate = datetime(year = int(first_year), month = int(first_month), day = int(first_day))
+    endDate = datetime(year = int(end_year), month = int(end_month), day = int(end_day))
+    date_check(startDate, endDate)
+    hist = stock_data.history(start = startDate, end = endDate)
+    if(len(hist.index) == 0):
+        print("Please input a valid date.")
+
+#create graph
+fig = make_subplots(specs=[[{"secondary_y" : True}]])
+fig.add_trace(go.Scatter(x=hist.index,y=hist['Close'],name='Price'),secondary_y=False)
+fig.add_trace(go.Bar(x=hist.index,y=hist['Volume'],name='Volume'),secondary_y=True)
+
+#update axes for visibility
+fig.update_yaxes(range=[0,7000000000],secondary_y=True)
+fig.update_yaxes(visible=False, secondary_y=True)
+fig.show()
+

@@ -1,0 +1,27 @@
+#Import Libraries
+from datetime import datetime
+import pandas
+import yfinance as yf
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+hist = pandas.DataFrame()
+#simple input command
+while (len(hist.index) == 0):
+    stock_year = input("Enter year for data: ")
+    stock_data = yf.Ticker("AAPL")
+    startDate = datetime(year = int(stock_year), month = 1, day = 1)
+    endDate = datetime(year = int(stock_year), month = 12, day = 31)
+    hist = stock_data.history(start = startDate, end = endDate)
+    if(len(hist.index) == 0):
+        print("Please input a valid year.")
+
+#create graph
+fig = make_subplots(specs=[[{"secondary_y" : True}]])
+fig.add_trace(go.Scatter(x=hist.index,y=hist['Close'],name='Price'),secondary_y=False)
+fig.add_trace(go.Bar(x=hist.index,y=hist['Volume'],name='Volume'),secondary_y=True)
+
+#update axes for visibility
+fig.update_yaxes(range=[0,7000000000],secondary_y=True)
+fig.update_yaxes(visible=False, secondary_y=True)
+fig.show()

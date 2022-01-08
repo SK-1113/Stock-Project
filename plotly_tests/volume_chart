@@ -14,4 +14,4 @@ fig2.add_trace(go.Bar(x=hist.index,y=hist['Volume'],name='Volume'),secondary_y=T
 #scaling the y-axis to make the volume bars smaller
 fig2.update_yaxes(range=[0,700000000],secondary_y=True)
 fig2.update_yaxes(visible=False, secondary_y=True)
-#fig2.show()
+fig2.show()
